@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+(function() {
     const todolist = document.getElementById('todo-list');
     const errormsg = document.querySelector('#error-msg');
     const cn = document.querySelector('#counter');
@@ -8,6 +8,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const txtf = document.querySelector('#todo-input');
     const addbtn = document.querySelector('#add-btn');
 
+    function updtcn() {
+        let total = todolist.getElementsByTagName('li').length;
+        let completed = todolist.getElementsByClassName('completed').length;
+        let count = total - completed;
+        cn.textContent = count + ' items left';
+    }
+
     function addTodo() {
         let txtcontent = txtf.value.trim();
         if (txtcontent == null || txtcontent == "") {
@@ -16,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
             errormsg.classList.add('hidden'); 
 
             let li_item = document.createElement('li');
-            
             
             let span_item = document.createElement('span');
             span_item.textContent = txtcontent;
@@ -40,17 +46,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     txtf.addEventListener('keydown', (e) => {
-        if (e.key == 'Enter') {
+        if (e.key === 'Enter') {
             e.preventDefault();
             addTodo();
         }
     });
     
     todolist.addEventListener('click', (e) => {
-        if (e.target.className == 'delete-btn') {
+        if (e.target.className === 'delete-btn') {
             e.target.parentNode.parentNode.removeChild(e.target.parentNode);
         }
-        else if (e.target.className == 'item-text') {
+        else if (e.target.className === 'item-text') {
             e.target.parentNode.classList.toggle('completed');
         }
         else if (e.target.tagName === 'LI') {
@@ -59,36 +65,33 @@ document.addEventListener('DOMContentLoaded', () => {
         updtcn();
     });
 
-    function updtcn(){
-       let count = todolist.querySelectorAll('li:not(.completed)').length;
-       cn.textContent = count + ' items left';
-    }
-    updtcn();
-    let items=todolist.children;
-    fall.addEventListener('click',()=>{
-        for(let a of items){
-            a.style.display='flex';
+    let items = todolist.children;
+    
+    fall.addEventListener('click', () => {
+        for(let a of items) {
+            a.style.display = 'flex';
         }
-    })
-    fact.addEventListener('click',()=>{
-        for(let b of items){
-            if(b.classList.contains('completed')){
-                b.style.display='none';
-            }
-            else{
-                b.style.display='flex';
+    });
+    
+    fact.addEventListener('click', () => {
+        for(let b of items) {
+            if(b.classList.contains('completed')) {
+                b.style.display = 'none';
+            } else {
+                b.style.display = 'flex';
             }
         }
-    })
-    fdon.addEventListener('click',()=>{
-        for(let c of items){
-            if(c.classList.contains('completed')){
-                c.style.display='flex';
+    });
+    
+    fdon.addEventListener('click', () => {
+        for(let c of items) {
+            if(c.classList.contains('completed')) {
+                c.style.display = 'flex';
+            } else {
+                c.style.display = 'none';
             }
-            else{
-                c.style.display='none';
-            }
+        }
+    });
 
-        }
-    })
-});
+    updtcn();
+})();
