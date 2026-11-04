@@ -1,26 +1,30 @@
-(function() {
+document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('submit', (e) => e.preventDefault());
+
     const todolist = document.getElementById('todo-list');
-    const errormsg = document.querySelector('#error-msg');
-    const cn = document.querySelector('#counter');
-    const fall = document.querySelector('#filter-all');
-    const fact = document.querySelector('#filter-active');
-    const fdon = document.querySelector('#filter-done');
-    const txtf = document.querySelector('#todo-input');
-    const addbtn = document.querySelector('#add-btn');
+    const errormsg = document.getElementById('error-msg');
+    const cn = document.getElementById('counter');
+    const fall = document.getElementById('filter-all');
+    const fact = document.getElementById('filter-active');
+    const fdon = document.getElementById('filter-done');
+    const txtf = document.getElementById('todo-input');
+    const addbtn = document.getElementById('add-btn');
 
     function updtcn() {
+        if (!todolist || !cn) return;
         let total = todolist.getElementsByTagName('li').length;
         let completed = todolist.getElementsByClassName('completed').length;
-        let count = total - completed;
-        cn.textContent = count + ' items left';
+        cn.textContent = (total - completed) + ' items left';
     }
 
     function addTodo() {
         let txtcontent = txtf.value.trim();
-        if (txtcontent == null || txtcontent == "") {
-            errormsg.classList.remove('hidden'); 
+        if (txtcontent === "") {
+            errormsg.classList.remove('hidden');
+            errormsg.style.display = 'block'; 
         } else {
-            errormsg.classList.add('hidden'); 
+            errormsg.classList.add('hidden');
+            errormsg.style.display = 'none';
 
             let li_item = document.createElement('li');
             
@@ -40,58 +44,72 @@
         }
     }
     
-    addbtn.addEventListener('click', (e) => {
-        e.preventDefault(); 
-        addTodo();
-    });
-
-    txtf.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
+    if (addbtn) {
+        addbtn.addEventListener('click', (e) => {
+            e.preventDefault(); 
             addTodo();
-        }
-    });
-    
-    todolist.addEventListener('click', (e) => {
-        if (e.target.className === 'delete-btn') {
-            e.target.parentNode.parentNode.removeChild(e.target.parentNode);
-        }
-        else if (e.target.className === 'item-text') {
-            e.target.parentNode.classList.toggle('completed');
-        }
-        else if (e.target.tagName === 'LI') {
-            e.target.classList.toggle('completed');
-        }
-        updtcn();
-    });
+        });
+    }
 
-    let items = todolist.children;
-    
-    fall.addEventListener('click', () => {
-        for(let a of items) {
-            a.style.display = 'flex';
-        }
-    });
-    
-    fact.addEventListener('click', () => {
-        for(let b of items) {
-            if(b.classList.contains('completed')) {
-                b.style.display = 'none';
-            } else {
-                b.style.display = 'flex';
+    if (txtf) {
+        txtf.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addTodo();
             }
-        }
-    });
+        });
+    }
     
-    fdon.addEventListener('click', () => {
-        for(let c of items) {
-            if(c.classList.contains('completed')) {
-                c.style.display = 'flex';
-            } else {
-                c.style.display = 'none';
+    if (todolist) {
+        todolist.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-btn')) {
+                e.target.parentElement.remove();
+                updtcn();
             }
-        }
-    });
+            else if (e.target.classList.contains('item-text')) {
+                e.target.parentElement.classList.toggle('completed');
+                updtcn();
+            }
+            else if (e.target.tagName === 'LI') {
+                e.target.classList.toggle('completed');
+                updtcn();
+            }
+        });
+    }
+
+    let items = todolist ? todolist.children : [];
+    
+    if (fall) {
+        fall.addEventListener('click', () => {
+            for(let a of items) {
+                a.style.display = 'flex';
+            }
+        });
+    }
+    
+    if (fact) {
+        fact.addEventListener('click', () => {
+            for(let b of items) {
+                if (b.classList.contains('completed')) {
+                    b.style.display = 'none';
+                } else {
+                    b.style.display = 'flex';
+                }
+            }
+        });
+    }
+    
+    if (fdon) {
+        fdon.addEventListener('click', () => {
+            for(let c of items) {
+                if (c.classList.contains('completed')) {
+                    c.style.display = 'flex';
+                } else {
+                    c.style.display = 'none';
+                }
+            }
+        });
+    }
 
     updtcn();
-})();
+});
