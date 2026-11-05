@@ -1,115 +1,119 @@
-document.addEventListener('DOMContentLoaded', () => {
-    document.addEventListener('submit', (e) => e.preventDefault());
+document.addEventListener('DOMContentLoaded', function () {
+  let form = document.querySelector('#todo-form');
+  let input = document.querySelector('#todo-input');
+  let errorMsg = document.querySelector('#error-msg');
+  let list = document.querySelector('#todo-list');
+  let counter = document.querySelector('#counter');
+  let allBtn = document.querySelector('#filter-all');
+  let activeBtn = document.querySelector('#filter-active');
+  let doneBtn = document.querySelector('#filter-done');
 
-    const todolist = document.getElementById('todo-list');
-    const errormsg = document.getElementById('error-msg');
-    const cn = document.getElementById('counter');
-    const fall = document.getElementById('filter-all');
-    const fact = document.getElementById('filter-active');
-    const fdon = document.getElementById('filter-done');
-    const txtf = document.getElementById('todo-input');
-    const addbtn = document.getElementById('add-btn');
+  let currentFilter = 'all';
 
-    function updtcn() {
-        if (!todolist || !cn) return;
-        let total = todolist.getElementsByTagName('li').length;
-        let completed = todolist.getElementsByClassName('completed').length;
-        cn.textContent = (total - completed) + ' items left';
-    }
-
-    function addTodo() {
-        let txtcontent = txtf.value.trim();
-        if (txtcontent === "") {
-            errormsg.classList.remove('hidden');
-            errormsg.style.display = 'block'; 
-        } else {
-            errormsg.classList.add('hidden');
-            errormsg.style.display = 'none';
-
-            let li_item = document.createElement('li');
-            
-            let span_item = document.createElement('span');
-            span_item.textContent = txtcontent;
-            span_item.className = 'item-text'; 
-            li_item.appendChild(span_item);
-            
-            let delbtn = document.createElement('button');
-            delbtn.textContent = "Delete";
-            delbtn.className = 'delete-btn';
-            li_item.appendChild(delbtn);
-            
-            todolist.appendChild(li_item);
-            txtf.value = "";
-            updtcn();
-        }
-    }
-    
-    if (addbtn) {
-        addbtn.addEventListener('click', (e) => {
-            e.preventDefault(); 
-            addTodo();
-        });
+  function updateCounter() {
+    let count = 0;
+    for (let li of list.children) {
+      if (!li.classList.contains('completed')) {
+        count++;
+      }
     }
 
-    if (txtf) {
-        txtf.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                addTodo();
-            }
-        });
+    if (count === 1) {
+      counter.textContent = count + ' item left';
+    } else {
+      counter.textContent = count + ' items left';
     }
-    
-    if (todolist) {
-        todolist.addEventListener('click', (e) => {
-            if (e.target.classList.contains('delete-btn')) {
-                e.target.parentElement.remove();
-                updtcn();
-            }
-            else if (e.target.classList.contains('item-text')) {
-                e.target.parentElement.classList.toggle('completed');
-                updtcn();
-            }
-            else if (e.target.tagName === 'LI') {
-                e.target.classList.toggle('completed');
-                updtcn();
-            }
-        });
+  }
+
+  function applyFilter() {
+    for (let li of list.children) {
+      let isDone = li.classList.contains('completed');
+      let show = true;
+
+      if (currentFilter === 'active' && isDone) {
+        show = false;
+      }
+      if (currentFilter === 'done' && !isDone) {
+        show = false;
+      }
+
+      if (show) {
+        li.style.display = '';
+        li.hidden = false;
+      } else {
+        li.style.display = 'none';
+        li.hidden = true;
+      }
+    }
+  }
+
+  function addItem(e) {
+    e.preventDefault();
+
+    let text = input.value.trim();
+
+    if (text === '') {
+      errorMsg.classList.remove('hidden');
+      return;
+    }
+    errorMsg.classList.add('hidden');
+
+    let li = document.createElement('li');
+
+    let span = document.createElement('span');
+    span.className = 'item-text';
+    span.textContent = text;
+
+    let deleteBtn = document.createElement('button');
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.textContent = 'Delete';
+
+    li.appendChild(span);
+    li.appendChild(deleteBtn);
+    list.appendChild(li);
+
+    input.value = '';
+    applyFilter();
+    updateCounter();
+  }
+
+  function handleListClick(e) {
+    let clicked = e.target;
+
+    if (clicked.classList.contains('delete-btn')) {
+      list.removeChild(clicked.parentNode);
+    } 
+    else if (clicked.classList.contains('item-text')) {
+      clicked.parentNode.classList.toggle('completed');
+    } 
+    else if (clicked.tagName === 'LI') {
+      clicked.classList.toggle('completed');
     }
 
-    let items = todolist ? todolist.children : [];
-    
-    if (fall) {
-        fall.addEventListener('click', () => {
-            for(let a of items) {
-                a.style.display = 'flex';
-            }
-        });
-    }
-    
-    if (fact) {
-        fact.addEventListener('click', () => {
-            for(let b of items) {
-                if (b.classList.contains('completed')) {
-                    b.style.display = 'none';
-                } else {
-                    b.style.display = 'flex';
-                }
-            }
-        });
-    }
-    
-    if (fdon) {
-        fdon.addEventListener('click', () => {
-            for(let c of items) {
-                if (c.classList.contains('completed')) {
-                    c.style.display = 'flex';
-                } else {
-                    c.style.display = 'none';
-                }
-            }
-        });
-    }
+    applyFilter();
+    updateCounter();
+  }
 
-    updtcn();
+  function showAll() {
+    currentFilter = 'all';
+    applyFilter();
+  }
+
+  function showActive() {
+    currentFilter = 'active';
+    applyFilter();
+  }
+
+  function showDone() {
+    currentFilter = 'done';
+    applyFilter();
+  }
+
+  form.addEventListener('submit', addItem);
+  list.addEventListener('click', handleListClick);
+  allBtn.addEventListener('click', showAll);
+  activeBtn.addEventListener('click', showActive);
+  doneBtn.addEventListener('click', showDone);
+
+  updateCounter();
 });
